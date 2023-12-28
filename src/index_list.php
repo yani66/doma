@@ -3,7 +3,7 @@
   {
     $mapInfo = $vd["MapInfo"][$map->ID];
     ?>
- 
+
   <div class="map">
     <div class="thumbnail">
       <?php 
@@ -45,9 +45,9 @@
           ?>
           <div class="listOverviewMapLink">
             <input type="hidden" value="<?php print $map->ID; ?>" />
-            <a class="showOverviewMap" href="#"><?php print __("SHOW_OVERVIEW_MAP"); ?></a>
-            <a class="hideOverviewMap" href="#"><?php print __("HIDE_OVERVIEW_MAP"); ?></a>
-            <span class="separator">|</span> 
+            <!-- <a class="showOverviewMap" href="#"><?php print __("SHOW_OVERVIEW_MAP"); ?></a>
+            <a class="hideOverviewMap" href="#"><?php print __("HIDE_OVERVIEW_MAP"); ?></a> 
+            <span class="separator">|</span> -->
             <a href="export_kml.php?id=<?php print $map->ID; ?>&amp;format=kml" title="<?php print __("KMZ_TOOLTIP"); ?>"><?php print __("KMZ"); ?></a>
           </div>
           <?php
@@ -97,10 +97,10 @@
         }
       }
       ?>
-    <?php if($map->IsGeocoded) { ?>
+    <!-- <?php if($map->IsGeocoded) { ?>
       <div class="clear"></div>
-      <div class="googleMapsContainer"></div>
-    <?php } ?>      
+      <div id="map" style="position: relative; overflow: hidden;"></div>
+    <?php } ?>  -->     
     <div class="clear"></div>
   </div>
 

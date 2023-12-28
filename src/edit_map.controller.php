@@ -3,6 +3,7 @@
 
   class EditMapController
   {
+
     public function Execute()
     {
 
@@ -16,6 +17,7 @@
       if(!Helper::IsLoggedInUser()) Helper::Redirect("users.php");
 
       if(isset($_GET["map"])) $mapID = $_GET["map"];
+      //if(isset($_GET["lat"])) $coo = array("lat" => $_GET["lat"], "lng" => $_GET["lng"]);
 
       foreach($_GET as $variable => $value) $$variable = stripslashes($value);
       foreach($_POST as $variable => $value) $$variable = stripslashes($value);
@@ -50,6 +52,8 @@
         if(__("SHOW_RESULT_LIST_URL")) $map->ResultListUrl = $resultListUrl;
         if(__("SHOW_COMMENT")) $map->Comment = $comment;
         $map->ProtectedUntil = $protectedUntil;
+        $map->MapCenterLatitude = $lat;
+        $map->MapCenterLongitude = $lng;
       }
       else
       {

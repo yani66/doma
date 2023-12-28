@@ -18,6 +18,19 @@
   <script type="text/javascript" src="js/jquery/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="js/show_map.js?v=<?php print DOMA_VERSION; ?>"></script>
   <script type="text/javascript" src="js/jquery/jquery.timeago.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    #map {
+      position: right;
+      height: 200px;
+      width: 900px;
+      float: right;
+    }
+  </style>
+
   <?php
     $lang = Session::GetLanguageCode();
     if($lang != "" && $lang != "en")
@@ -52,12 +65,13 @@
 
 
 </head>
+
 <body id="showMapBody">
 <center>
 <div id="top_menu">
 <div id="wrapper" <?php if($vd["Map"]->IsGeocoded) {print 'style="float:left"';} else {print 'style="float:center"';}?>>
 <?php Helper::CreateTopbar() ?>
-
+<div id="map"></div>
 <div id="navigation">
   <div class="left">
   <?php if(isset($vd["SecondMapImageName"])) {?>
@@ -65,14 +79,14 @@
     <a href="#" id="hideSecondImage" title="<?php print __("TOGGLE_IMAGE_TOOLTIP")?>"><?php print __("HIDE_ROUTE_ON_MAP")?></a>
     <span class="separator">|</span>
   <?php }?>
-  <?php if(isset($QR) && $QR->IsValid) { ?>
+  <!-- <?php if(isset($QR) && $QR->IsValid) { ?>
     <a id="showOverviewMap" href="#"><?php print __("SHOW_OVERVIEW_MAP"); ?></a>
     <a id="hideOverviewMap" href="#"><?php print __("HIDE_OVERVIEW_MAP"); ?></a>
     <span class="separator">|</span>
     <a href="export_kml.php?id=<?php print $map->ID; ?>&amp;format=kml" title="<?php print __("KMZ_TOOLTIP"); ?>"><?php print __("KMZ"); ?></a>
     <span class="separator">|</span>
-  <?php } ?>
-  <a href="<?php print $vd["BackUrl"]?>"><?php print __("BACK")?></a>
+  <?php } ?> -->
+  <a href="javascript:history.back()"><?php print __("BACK")?></a>
   </div>
   <div class="right">
   <?php if($vd["Previous"]) { ?><a href="show_map.php?<?php print Helper::CreateQuerystring(getCurrentUser(), $vd["Previous"]->ID)?>"><?php print "&lt;&lt; ". $vd["PreviousName"]; ?></a><?php } ?>
@@ -185,25 +199,25 @@ if(isset($QR) && $QR->IsValid)
 ?>
 
 
-
 <div class="clear"></div>
 
 </form>
 </div>
 </div>
 <?php
-if($map->IsGeocoded)
-{
-  $coordinates = $map->MapCenterLatitude .",". $map->MapCenterLongitude;
-  print '<input id="gmap_coordinates" type="hidden" value="'.$coordinates.'" />';
-  print '<input id="gmap_url" type="hidden" value="'.$vd["GoogleMapsUrl"].'" />';
-  print '<input id="gmap_lang" type="hidden" value="'.Session::GetLanguageCode().'" />';
-  print '<input id="gmap_key" type="hidden" value="'.GOOGLE_MAPS_API_KEY.'" />';
-  print '<div id="gmap">';
-  print '</div>';
-}
-?>
-</div>
+// if($map->IsGeocoded)
+// {
+//   $coordinates = $map->MapCenterLatitude .",". $map->MapCenterLongitude;
+//   print '<input id="gmap_coordinates" type="hidden" value="'.$coordinates.'" />';
+//   print '<input id="gmap_url" type="hidden" value="'.$vd["GoogleMapsUrl"].'" />';
+//   print '<input id="gmap_lang" type="hidden" value="'.Session::GetLanguageCode().'" />';
+//   print '<input id="gmap_key" type="hidden" value="'.GOOGLE_MAPS_API_KEY.'" />';
+//   print '<div id="gmap">';
+//   print '</div>';
+// }
+// ?>
+// </div>
+
 <div class="clear">&nbsp;</div>
 
 <div id="overviewMapContainer"></div>
@@ -218,6 +232,37 @@ if($map->IsGeocoded)
   <input type="hidden" id="imageHeight" value="<?php print $vd["ImageHeight"] ?>" />
 </div>
 </center>
+
+<?php
+    include_once(dirname(__FILE__) ."/include/data_access.php");
+    $dA = new DataAccess;
+    if(isset($_GET["map"])) $mapID = $_GET["map"];
+    $coo = array('latitude' => 0, 'longitude' => 0);
+    if(isset($mapID)) {
+    $coo = $dA->GetMapData($mapID);
+    }
+    if($coo["latitude"] == null || $coo["longitude"] == null) {
+      $coo = array('latitude' => 0, 'longitude' => 0);
+    }
+  ?>
+
+
+<script>
+  var iconOl = L.icon({
+        iconUrl: './gfx/MapMarkerOL.png',
+
+        iconAnchor: [17,44],
+        popupAnchor: [0, -45]
+      })
+  var map = L.map('map', {worldCopyJump: true}).setView([<?php echo json_encode($coo["latitude"]); ?>,<?php echo json_encode($coo["longitude"]); ?>], 15);
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map)
+  L.marker([<?php echo json_encode($coo["latitude"]); ?>,<?php echo json_encode($coo["longitude"]); ?>], {icon: iconOl}).addTo(map);
+</script>
+
+
 <?php Helper::GoogleAnalytics() ?>
 </body>
 </html>

@@ -373,6 +373,7 @@ form.wide h2 + p
 #indexBody #content form
 {
   padding-bottom: 1em;
+  margin: auto;
 }
 
 #intro

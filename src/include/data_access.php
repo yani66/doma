@@ -764,7 +764,7 @@
       $key = mysqli_real_escape_string($GLOBALS["dbCon"], $key);
       $sql = "SELECT `Value` FROM `". DB_SETTING_TABLE ."` WHERE `Key`='$key'";
       $rs = self::Query($sql);
-      if($r = @mysqli_fetch_assoc($rs))
+      if($rs instanceof mysqli_result && $r = @mysqli_fetch_assoc($rs))
       {
         return $r["Value"];
       }
@@ -779,9 +779,55 @@
       self::Query($sql);
     }
 
+    public static function GetMapData($id)
+    {
+      if($id == null) return false;
+      $id = mysqli_real_escape_string($GLOBALS["dbCon"], $id);
+      $sql = "SELECT * FROM `". DB_MAP_TABLE ."` WHERE ID ='$id'";
+      $rs = self::Query($sql);
+      if($rs->num_rows > 0) {
+        while($row = $rs->fetch_assoc()) {
+          $coordinates = array("latitude" => $row["MapCenterLatitude"], "longitude" => $row["MapCenterLongitude"], "name" => $row["Name"], "id" => $row["ID"], "userID" => $row["UserID"]);
+        }
+      }
+      if($coordinates != null) 
+      {
+        return $coordinates;
+      }
+    }
+
+    public static function GetAllMapIdsFromUser($userID)
+    {
+      $sql = "SELECT ID FROM doma_maps WHERE UserID = '$userID'";
+      $rs = self::Query($sql);
+      $ids = array();
+      while($r = mysqli_fetch_assoc($rs))
+      {
+        array_push($ids, $r["ID"]);
+      }
+      return $ids;
+    }
+
+    public static function GetAllIdsForMap()
+    {
+      $sql = "SELECT ID FROM doma_maps'";
+      $rs = self::Query($sql);
+      $ids = array();
+      while($r = mysqli_fetch_assoc($rs))
+      {
+        array_push($ids, $r["ID"]);
+      }
+      return $ids;
+    }
+
     private static function Query($sql)
     {
-      $result = @mysqli_query($GLOBALS["dbCon"], $sql);
+      try {
+			$result = @mysqli_query($GLOBALS["dbCon"], $sql);
+		} catch (mysqli_sql_exception $e) {
+			$result = false;
+	}
+
       Helper::WriteToLog($sql);
 	  $error = mysqli_error($GLOBALS["dbCon"]);
       if($error) Helper::WriteToLog("MYSQL ERROR: ". $error);

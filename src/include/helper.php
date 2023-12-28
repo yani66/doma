@@ -475,6 +475,8 @@
           <?php } ?>
         </div>
         <div class="right">
+          <a href="overview_map.php?<?php print Helper::CreateQuerystring(getCurrentUser())?>"><?php print __("DISPLAY_MODE_OVERVIEW_MAP"); ?></a>
+          <span class="separator">|</span>
           <a href="users.php"><?php print __("ALL_USERS"); ?></a>
           <span class="separator">|</span>
           <?php
@@ -507,6 +509,8 @@
           <?php } ?>
         </div>
         <div class="right">
+          <a href="<?php print PROJECT_DIRECTORY?>/all_maps_overview.php"><?php print __("DISPLAY_MODE_OVERVIEW_MAP"); ?></a>
+          <span class="separator">|</span>
           <?php
           if(SHOW_LANGUAGES_IN_TOPBAR=="1")
           {

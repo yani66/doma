@@ -1,4 +1,5 @@
 <?php
+  mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
   include_once(dirname(__FILE__) ."/include/main.php");
   include_once(dirname(__FILE__) ."/index.controller.php");
   include_once(dirname(__FILE__) ."/include/json.php");
@@ -18,16 +19,7 @@
   <script src="js/jquery/jquery-1.7.1.min.js" type="text/javascript"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=<?php print GOOGLE_MAPS_API_KEY; ?>&amp;language=<?php print Session::GetLanguageCode(); ?>" type="text/javascript"></script>
   <script src="js/overview_map.js?v=<?php print DOMA_VERSION; ?>" type="text/javascript"></script>
-  <?php if($vd["DisplayMode"] == "overviewMap") { ?>
-    <script type="text/javascript">
-      <!--
-      $(function() {
-        var overviewMapData = <?php print json_encode($vd["OverviewMapData"]); ?>;
-        $("#overviewMap").overviewMap({ data: overviewMapData });
-      });
-      -->
-    </script>
-  <?php } ?>
+
   <script src="js/index.js?v=<?php print DOMA_VERSION; ?>" type="text/javascript"></script>
   <script src="js/common.js?v=<?php print DOMA_VERSION; ?>" type="text/javascript"></script>
 </head>
@@ -36,8 +28,7 @@
 <div id="wrapper">
 <?php Helper::CreateTopbar() ?>
 <div id="content">
-<form method="get" action="<?php print Helper::SelfPath()?>?<?php print Helper::CreateQuerystring(getCurrentUser())?>">
-<input type="hidden" name="user" value="<?php print getCurrentUser()->Username;?>"/>
+
 <?php if(count($vd["Errors"]) > 0) { ?>
 <ul class="error">
 <?php
@@ -49,6 +40,11 @@
 </ul>
 <?php } ?>
 
+
+<form method="get" action="<?php print Helper::SelfPath()?>?<?php print Helper::CreateQuerystring(getCurrentUser())?>">
+<input type="hidden" name="user" value="<?php print getCurrentUser()->Username;?>"/>
+
+<br/>
 <div>
   <img id="logo" src="gfx/book.png" alt="" />
 </div>
@@ -57,7 +53,14 @@
 
 <div id="intro">
 <h1><?php print __("CAPTION")?></h1>
-<p><?php print nl2br(__("INTRO"))?></p>
+<p><?php print nl2br(__("INTRO"))?>
+
+<?php 
+  $user = Helper::CreateQuerystring(getCurrentUser());
+  $user = explode('=', $user);
+?>
+
+</p>
 
 <div id="selectCategoryAndYear">
 <?php
@@ -91,13 +94,12 @@
   <label for="filter"><?php print __("SELECT_FILTER"); ?>:</label>
   <input type="text" name="filter" id="filter" value="<?php print hsc($vd["SearchCriteria"]["filter"]); ?>"/>
 
-  <?php if($vd["GeocodedMapsExist"]) { ?>
     <label for="displayMode"><?php print __("SELECT_DISPLAY_MODE"); ?>:</label>
     <select name="displayMode" id="displayMode">
       <option value="list"<?php if($vd["DisplayMode"] == "list") print ' selected="selected"'; ?>><?php print __("DISPLAY_MODE_LIST")?></option>
       <option value="overviewMap"<?php if($vd["DisplayMode"] == "overviewMap") print ' selected="selected"'; ?>><?php print __("DISPLAY_MODE_OVERVIEW_MAP")?></option>
-    </select>
-  <?php } ?>
+    </select> 
+
 <?php } ?>
 </div>
 </div>

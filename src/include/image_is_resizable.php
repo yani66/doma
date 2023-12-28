@@ -2,7 +2,7 @@
   include_once(dirname(__FILE__) ."/helper.php");
   $filename = $_GET["filename"];
   $result = 0;
-  if(file_exists($filename))
+  if(is_resource($image) || $image instanceof \GdImage)
   {
     $image = Helper::ImageCreateFromGeneral($filename);
     if(is_resource($image))

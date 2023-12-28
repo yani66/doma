@@ -189,8 +189,10 @@
       }
       else
       {
+        if(isset($this->MapCenterLatitude)) {
         $this->MapCenterLatitude = null;
         $this->MapCenterLongitude = null;
+        }
         $this->MapCorners = null;
         $this->SessionStartTime = null;
         $this->SessionEndTime = null;

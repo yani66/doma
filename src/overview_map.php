@@ -1,5 +1,3 @@
-<!-- <div id="overviewMap"></div> -->
-
 <?php
   include_once(dirname(__FILE__) ."/include/main.php");
   include_once(dirname(__FILE__) ."/include/data_access.php");
@@ -34,18 +32,31 @@ function console($data) {
 	<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster-src.js"></script>
 
   <style>
+    body {
+            padding: 0;
+            margin: 0;
+        }
         html, body, #map {
-        	margin: auto;
-        	position: float;
-            height: 500px;
+            height: 100%;
             width: 100%;
         }
+        #backButton {
+		  position: absolute;
+		  top: 20px;
+		  left: 50px;
+		  padding: 10px;
+		  z-index: 400;
+		}
   </style>
 </head>
 
 <body>
 
 	<div id="map"></div>
+	<button id="backButton" onclick="history.back()"><?php print __("BACK"); ?></button>
+
+
+
 
 
 
@@ -60,7 +71,7 @@ function console($data) {
     	}
     }
   ?>
-<a id='a' type="hidden" href=""></a>
+<a id='a' href="">LOL</a>
 <script>
 
 	var iconOl = L.icon({
@@ -69,7 +80,6 @@ function console($data) {
         iconAnchor: [17,44],
         popupAnchor: [0, -45]
       })
-
   var map = L.map('map', {worldCopyJump: true}).setView([0,0], 2);
   var coo = <?php echo json_encode($coords); ?>;
 
@@ -80,9 +90,11 @@ function console($data) {
   L.Control.geocoder().addTo(map);
   var shelter = new L.markerClusterGroup();
 
+window.onload=()=>{
+
   for (var i = coo.length -  1; i >= 0; i--) {
   	if(coo[i]["latitude"] != null) {
-	var elem = document.getElementById('a').cloneNode(true);
+	var elem = document.getElementById('a');
 	elem.href = "http://map-warehouse.bplaced.net/DOMA/show_map.php?<?php print Helper::CreateQuerystring(getCurrentUser())?>&map=";
   	elem.text = coo[i]["name"];
     elem.href += coo[i]["id"];
@@ -93,6 +105,7 @@ function console($data) {
   }
   map.addLayer(shelter);
   map.fitBounds(shelter.getBounds());
+}
 </script>
 
 </body>

@@ -42,6 +42,15 @@
         if($data != null) $viewData["OverviewMapData"][] = $data;
       }
 
+      if(isset($_GET["displayMode"])) 
+      {
+        $viewData["DisplayMode"] = $_GET["displayMode"];
+      }
+      else
+      {
+        $viewData["DisplayMode"] = "list";
+      }
+
       if(isset($_GET["error"]) && $_GET["error"] == "email") $errors[] = sprintf(__("ADMIN_EMAIL_ERROR"), ADMIN_EMAIL);
       
       $viewData["Errors"] = $errors;

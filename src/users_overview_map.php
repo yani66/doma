@@ -1,12 +1,9 @@
-<!-- <div id="overviewMap"></div> -->
-
 <?php
   include_once(dirname(__FILE__) ."/include/main.php");
   include_once(dirname(__FILE__) ."/include/data_access.php");
 
   $dA = new DataAccess();
-  $userId = (int) $dA->GetUserByUsername($_GET['user'])->ID;
-  $ids = $dA->GetAllMapIdsFromUser($userId);
+  $ids = $dA->GetAllMapIds();
 ?>
 
 <?php
@@ -44,7 +41,7 @@ function console($data) {
 </head>
 
 <body>
-
+  <h2></h2>
 	<div id="map"></div>
 
 
@@ -56,6 +53,7 @@ function console($data) {
     	$coo = array();
     	foreach ($ids as $value) {
     		$coo = $dA->GetMapData($value);
+        $coo["user"] = $dA->GetUserByID($coo["userID"])->Username;
     		array_push($coords, $coo);
     	}
     }
@@ -69,7 +67,6 @@ function console($data) {
         iconAnchor: [17,44],
         popupAnchor: [0, -45]
       })
-
   var map = L.map('map', {worldCopyJump: true}).setView([0,0], 2);
   var coo = <?php echo json_encode($coords); ?>;
 
@@ -83,16 +80,18 @@ function console($data) {
   for (var i = coo.length -  1; i >= 0; i--) {
   	if(coo[i]["latitude"] != null) {
 	var elem = document.getElementById('a').cloneNode(true);
-	elem.href = "http://map-warehouse.bplaced.net/DOMA/show_map.php?<?php print Helper::CreateQuerystring(getCurrentUser())?>&map=";
+	elem.href = "http://map-warehouse.bplaced.net/DOMA/show_map.php?user=";
   	elem.text = coo[i]["name"];
+    elem.href += coo[i]["user"];
+    elem.href += "&map=";
     elem.href += coo[i]["id"];
     coo[i].link= elem.cloneNode(true);
-
   	shelter.addLayer(L.marker([coo[i]["latitude"],coo[i]["longitude"]], {icon: iconOl}).bindPopup(coo[i]["link"]));
   }
   }
   map.addLayer(shelter);
   map.fitBounds(shelter.getBounds());
+
 </script>
 
 </body>

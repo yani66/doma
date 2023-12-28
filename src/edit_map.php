@@ -1,21 +1,36 @@
 <?php
   include_once(dirname(__FILE__) ."/edit_map.controller.php");
 
+
   $controller = new EditMapController();
   $vd = $controller->Execute();
   $map = $vd["Map"];
+
+
 ?>
 <?php print '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <link rel="stylesheet" href="style.css?v=<?php print DOMA_VERSION; ?>" type="text/css" />
+
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <title><?php print __("PAGE_TITLE")?> :: <?php print $vd["Title"]; ?></title>
   <link rel="icon" type="image/png" href="gfx/favicon.png" />
   <script type="text/javascript" src="js/jquery/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="js/edit_map.js?v=<?php print DOMA_VERSION; ?>"></script>
   <script src="js/common.js?v=<?php print DOMA_VERSION; ?>" type="text/javascript"></script>
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <style>
+    #map {position: relative; height: 400px; width: 600px};
+  </style>
 </head>
 
 <body id="editMapBody">
@@ -146,8 +161,63 @@
 ?>
 <label for="protectedUntil"><?php print __("PROTECTED_UNTIL")?></label>
 <input type="text" id="protectedUntil" class="text tooltipControl" name="protectedUntil" value="<?php print hsc($protectedUntil); ?>" />
+
+<input type="hidden" name="lat" id="lat" value="<?php print hsc($map->MapCenterLatitude)?>">
+<input type="hidden" name="lng" id="lng" value="<?php print hsc($map->MapCenterLongitude)?>">
+
 <div class="tooltip hidden"><?php print __("PROTECTED_UNTIL_INFO")?></div>
 </div>
+
+<?php
+function console($data) {
+    $output = $data;
+    if (is_array($output))
+        $output = implode(',', $output);
+
+    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+}
+?>
+
+<?php
+  include_once(dirname(__FILE__) ."/include/data_access.php");
+  $dA = new DataAccess;
+  $coo = array('latitude' => 0, 'longitude' => 0);
+  if(isset($vd["MapID"])) {
+  $coo = $dA->GetMapData($vd["MapID"]);
+  }
+  if($coo["latitude"] == null || $coo["longitude"] == null) {
+    $coo = array('latitude' => 0, 'longitude' => 0);
+  }
+?>
+
+<div class="container">
+<div id = "map"></div>
+  <script>
+      var iconOl = L.icon({
+        iconUrl: './gfx/MapMarkerOL.png',
+
+        iconAnchor: [17,44]
+      })
+
+      var map = L.map('map', {worldCopyJump: true}).setView([50.973, 10.386], 5);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      L.Control.geocoder().addTo(map);
+      var marker = L.marker([<?php echo json_encode($coo["latitude"]); ?>,<?php echo json_encode($coo["longitude"]); ?>], {icon: iconOl}).addTo(map);
+
+      function onMapClick(e) {
+        marker.setLatLng(e.latlng)
+        document.getElementById('lat').value = e.latlng.lat;
+        document.getElementById('lng').value = e.latlng.lng;
+      }
+
+      map.on('click', onMapClick);
+  </script>
+</div>
+
+  
 
 <div class="buttons">
 <input type="submit" class="submit" name="save" id="save" value="<?php print __("SAVE")?>" />

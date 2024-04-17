@@ -25,4 +25,4 @@ For a better overview click the "Map Overview" button in the Topbar to have a fu
 With these changes the export from QuickRoute is not blocked and can be used to it's full potential.
 
 When finding bugs or other problems please open an issue. <br/>
-For an installation guide & feature list visit <a href="https://www.matstroeng.se/doma/">DOMA</a> 
+For an installation guide & extended feature list visit <a href="https://www.matstroeng.se/doma/">DOMA</a> 
